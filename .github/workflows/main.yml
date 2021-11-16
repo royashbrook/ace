@@ -21,52 +21,61 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
-    # - name: Cache ACE Installer
-    #   id: cache-ace
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: ace.exe
-    #     key: ace
-
-    # - name: Download ACE
-    #   if: steps.cache-ace.outputs.cache-hit != 'true'
-    #   shell: pwsh
-    #   run: |
-    #     $ProgressPreference = 'SilentlyContinue'
-    #     $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
-    #     irm $uri -outfile ace.exe
-    #     $ProgressPreference = 'Continue'
-
-    # - name: Show data sources before ACE
-    #   shell: pwsh
-    #   run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
-
-    # - name: Install ACE
-    #   shell: pwsh
-    #   run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
-        
-    # - name: Show data sources after ACE
-    #   shell: pwsh
-    #   run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
-
-    - name: Cache Modules
-      id: cache-modules
+    - name: Cache ACE Installer
+      id: cache-ace
       uses: actions/cache@v2
       with:
-        path: "~/.local/share/powershell/Modules"
-        key: ImportExcel
+        path: ace.exe
+        key: ace
 
-    - name: Install ImportExcel
-      if: steps.cache-modules.outputs.cache-hit != 'true'
+    - name: Download ACE
+      if: steps.cache-ace.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        $ProgressPreference = 'SilentlyContinue'
+        $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
+        irm $uri -outfile ace.exe
+        $ProgressPreference = 'Continue'
+
+    - name: Show data sources before ACE
+      shell: pwsh
+      run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+
+    - name: Install ACE
+      shell: pwsh
+      run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
+        
+    - name: Show data sources after ACE
+      shell: pwsh
+      run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+
+    # Setting up required powershell modules
+    - name: Set required PowerShell modules
+      id: psmodulecache
+      uses: potatoqualitee/psmodulecache@v1
+      with:
+        modules-to-cache: ImportExcel
+    
+      # Setting up the powershell module cache
+    - name: Setup PowerShell module cache
+      id: cacher
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.psmodulecache.outputs.modulepath }}
+        key: ${{ steps.psmodulecache.outputs.keygen }}
+      
+      # Installing the required powershell module, if not cached
+    - name: Install required PowerShell modules
+      if: steps.cacher.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
         Set-PSRepository PSGallery -InstallationPolicy Trusted
-        Install-Module ImportExcel
+        Install-Module ${{ steps.psmodulecache.outputs.needed }} -ErrorAction Stop
 
     - name: Try and run the Examples.ps1
       shell: pwsh
       run: |
         Import-Module ImportExcel
-        $x = (get-module ImportExcel).path
-        cd $x\examples\InvokeExcelQuery
+        cd (get-module ImportExcel).path
+        cd .\examples\InvokeExcelQuery
         .\Examples.ps1
