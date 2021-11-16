@@ -37,14 +37,14 @@ jobs:
         irm $uri -outfile ace.exe
         $ProgressPreference = 'Continue'
 
-      - name: Show data sources before ACE
-        shell: pwsh
-        run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+    - name: Show data sources before ACE
+      shell: pwsh
+      run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
 
-      - name: Install ACE
-        shell: pwsh
-        run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
-          
-      - name: Show data sources after ACE
-        shell: pwsh
-        run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+    - name: Install ACE
+      shell: pwsh
+      run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
+        
+    - name: Show data sources after ACE
+      shell: pwsh
+      run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
