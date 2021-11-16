@@ -76,6 +76,6 @@ jobs:
       shell: pwsh
       run: |
         Import-Module ImportExcel
-        cd (get-module ImportExcel).path
+        cd (split-path (get-module ImportExcel).path -parent)
         cd .\examples\InvokeExcelQuery
         .\Examples.ps1
