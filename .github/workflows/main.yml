@@ -65,9 +65,10 @@ jobs:
 
     - name: Try and run the Examples.ps1
       shell: pwsh
-      run: |
-        $x = (get-module ImportExcel).path
-        $x
-        cd $x\examples\InvokeExcelQuery
-        dir
-        .\Examples.ps1
+      run: get-module ImportExcel | fl *
+      # |
+      #   $x = (get-module ImportExcel).path
+      #   $x
+      #   cd $x\examples\InvokeExcelQuery
+      #   dir
+      #   .\Examples.ps1
