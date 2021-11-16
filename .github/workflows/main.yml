@@ -48,3 +48,15 @@ jobs:
     - name: Show data sources after ACE
       shell: pwsh
       run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+
+    - name: Install ImportExcel
+      shell: pwsh
+      run: |
+        Set-PSRepository PSGallery -InstallationPolicy Trusted
+        Install-Module ImportExcel
+
+    - name: Try and run the Examples.ps1
+      shell: pwsh
+      run: |
+        cd (join-path (split-path (get-module ImportExcel).path -parent) examples\InvokeExcelQuery)
+        .\Examples.ps1
