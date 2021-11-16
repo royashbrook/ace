@@ -35,7 +35,7 @@ jobs:
           $ProgressPreference = 'Continue'
 
       - name: Install ACE
-        run: .\ace.exe /quiet /passive /norestart
+        run: D:\a\ace\ace\ace.exe /quiet /passive /norestart
           
       - name: Show data sources again
         shell: pwsh
