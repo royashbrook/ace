@@ -1,24 +1,14 @@
-# This is a basic workflow to help you get started with Actions
+name: main
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  main:
     runs-on: windows-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
     - name: Cache ACE Installer
@@ -33,8 +23,7 @@ jobs:
       shell: pwsh
       run: |
         $ProgressPreference = 'SilentlyContinue'
-        $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
-        irm $uri -outfile ace.exe
+        irm ${{ secrets.ACE_URI }} -outfile ace.exe
         $ProgressPreference = 'Continue'
 
     - name: Show data sources before ACE
