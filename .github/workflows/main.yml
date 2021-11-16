@@ -21,24 +21,30 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
-      - name: Show data sources
+    - name: Cache ACE Installer
+      id: cache-ace
+      uses: actions/cache@v2
+      with:
+        path: ace.exe
+        key: ace
+
+    - name: Download ACE
+      if: steps.cache-ace.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        $ProgressPreference = 'SilentlyContinue'
+        $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
+        irm $uri -outfile ace.exe
+        $ProgressPreference = 'Continue'
+
+      - name: Show data sources before ACE
         shell: pwsh
         run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
 
-      - name: Download ACE
-        shell: pwsh
-        run: |
-          $ProgressPreference = 'SilentlyContinue'
-          $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
-          irm $uri -outfile .\ace.exe
-          $ProgressPreference = 'Continue'
-
       - name: Install ACE
         shell: pwsh
-        run: |
-          dir .\ace.exe
-          Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
+        run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
           
-      - name: Show data sources again
+      - name: Show data sources after ACE
         shell: pwsh
         run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
