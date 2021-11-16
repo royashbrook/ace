@@ -30,12 +30,14 @@ jobs:
         run: |
           $ProgressPreference = 'SilentlyContinue'
           $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
-          irm $uri -outfile .\ace.msi
-          dir .\
+          irm $uri -outfile .\ace.exe
           $ProgressPreference = 'Continue'
 
       - name: Install ACE
-        run: D:\a\ace\ace\ace.exe /quiet /passive /norestart
+        shell: pwsh
+        run: |
+          dir .\ace.exe
+          Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
           
       - name: Show data sources again
         shell: pwsh
