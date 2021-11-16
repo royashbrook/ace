@@ -8,8 +8,6 @@ on:
   push:
     branches: [ main ]
 
-#https://drive.google.com/file/d/14-NGRz1WXvC-71QBjMYJVpvgE2U0wR4t/view?usp=sharing
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -32,7 +30,7 @@ jobs:
         run: |
           $ProgressPreference = 'SilentlyContinue'
           $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
-          irm $uri -outfile ace.msi
+          irm $uri -outfile .\ace.msi
           $ProgressPreference = 'Continue'
 
       - name: Install ACE
