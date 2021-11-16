@@ -21,35 +21,43 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
-    - name: Cache ACE Installer
-      id: cache-ace
+    # - name: Cache ACE Installer
+    #   id: cache-ace
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: ace.exe
+    #     key: ace
+
+    # - name: Download ACE
+    #   if: steps.cache-ace.outputs.cache-hit != 'true'
+    #   shell: pwsh
+    #   run: |
+    #     $ProgressPreference = 'SilentlyContinue'
+    #     $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
+    #     irm $uri -outfile ace.exe
+    #     $ProgressPreference = 'Continue'
+
+    # - name: Show data sources before ACE
+    #   shell: pwsh
+    #   run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+
+    # - name: Install ACE
+    #   shell: pwsh
+    #   run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
+        
+    # - name: Show data sources after ACE
+    #   shell: pwsh
+    #   run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+
+    - name: Cache Modules
+      id: cache-modules
       uses: actions/cache@v2
       with:
-        path: ace.exe
-        key: ace
-
-    - name: Download ACE
-      if: steps.cache-ace.outputs.cache-hit != 'true'
-      shell: pwsh
-      run: |
-        $ProgressPreference = 'SilentlyContinue'
-        $uri = 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'
-        irm $uri -outfile ace.exe
-        $ProgressPreference = 'Continue'
-
-    - name: Show data sources before ACE
-      shell: pwsh
-      run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
-
-    - name: Install ACE
-      shell: pwsh
-      run: Start-Process .\ace.exe -Wait -ArgumentList "/quiet /passive /norestart"
-        
-    - name: Show data sources after ACE
-      shell: pwsh
-      run: (New-Object system.data.oledb.oledbenumerator).GetElements().SOURCES_NAME
+        path: "~/.local/share/powershell/Modules"
+        key: ImportExcel
 
     - name: Install ImportExcel
+      if: steps.cache-modules.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
         Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -58,5 +66,8 @@ jobs:
     - name: Try and run the Examples.ps1
       shell: pwsh
       run: |
-        cd (join-path (split-path (get-module ImportExcel).path -parent) examples\InvokeExcelQuery)
+        $x = (get-module ImportExcel).path
+        $x
+        cd $x\examples\InvokeExcelQuery
+        dir
         .\Examples.ps1
